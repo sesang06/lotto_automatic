@@ -1,0 +1,36 @@
+name: Run Selenium Script
+
+on:
+  workflow_dispatch: # 수동으로 실행
+  schedule:
+    - cron: '0 9 * * 1'  # At 09:00 on Monday
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
+    - run: chrome --version
+    - name: Get Chrome version
+      id: chrome_version
+      run: echo "CHROME_VERSION=$(google-chrome-stable --version | cut -d ' ' -f 3 | cut -d '.' -f 1)" >> $GITHUB_ENV
+
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install selenium
+    - uses: nanasess/setup-chromedriver@v2
+    - name: Run Selenium Script
+      run: python main.py
